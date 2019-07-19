@@ -15,7 +15,7 @@ def job_offers(jobs="technical-test-jobs.csv", professions="technical-test-profe
         with open(jobs, encoding="utf-8", newline='') as f:
             reader = csv.reader(f)
             for row in reader:
-                jobsList.append([row[1], row[0]])# (seules les 2 premières colonnes sont utiles)
+                jobsList.append([row[1], row[0]])  # (seules les 2 premières colonnes sont utiles)
         del jobsList[0]  # retire la première ligne de la liste (titre)
 
         # remplace les jobId par les jobCategory correspondants
@@ -23,16 +23,12 @@ def job_offers(jobs="technical-test-jobs.csv", professions="technical-test-profe
             jobCategory = professionsType.get(job[1])
             job[1] = jobCategory
 
-
         # prépare les coordonnées du tableau résultat
-
         jobsCategories = set()
         contractTypes = set()
         for job in jobsList:
             jobsCategories.add(job[1])
             contractTypes.add(job[0])
-
-        # compte les résultats
 
         # initialise la première lignes des résultats
         title = ["---JOBS---"]
@@ -43,6 +39,7 @@ def job_offers(jobs="technical-test-jobs.csv", professions="technical-test-profe
                 title.append("AUTRE")
         count = [title]
 
+        # construit le tableau résultat
         lin = 1
         for contract in contractTypes:
             col = 1
