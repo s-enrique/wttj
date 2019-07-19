@@ -1,4 +1,3 @@
-from collections import Counter
 import csv
 
 
@@ -32,7 +31,6 @@ def job_offers(jobs="technical-test-jobs.csv", professions="technical-test-profe
         for job in jobsList:
             jobsCategories.add(job[1])
             contractTypes.add(job[0])
-
 
         # compte les résultats
 
@@ -69,3 +67,29 @@ def display_jobs(count):
 
 
 display_jobs(job_offers())
+
+
+def nb_offre(jobs="technical-test-jobs.csv"):
+    # nb d'offre dans le csv
+    nboffre = 0
+    with open(jobs, encoding="utf-8", newline='') as f:
+        reader = csv.reader(f)
+        for row in reader:
+            nboffre += 1
+    return nboffre-1  # retire la ligne de titre
+
+
+def test_total(jobs="technical-test-jobs.csv"):
+    array = job_offers()
+    total = 0
+    for value in array:
+        total += sum([i for i in value if isinstance(i, int)])
+
+    assert total == nb_offre(jobs)
+
+
+
+
+test_total()
+
+
