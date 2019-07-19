@@ -1,76 +1,71 @@
 from collections import Counter
 import csv
 
-jobs = "technical-test-jobs.csv"
-professions = "technical-test-professions.csv"
+
+def job_offers(jobs="technical-test-jobs.csv", professions="technical-test-professions.csv"):
+    try:
+        # importe la liste des professions sous forme d'un dictionnaire
+        professionsType = {}
+        with open(professions, encoding="utf-8", newline='') as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                professionsType.update({row["id"]: row["category_name"]})
+
+        # importe la liste des jobs
+        jobsList = []
+        with open(jobs, encoding="utf-8", newline='') as f:
+            reader = csv.reader(f)
+            for row in reader:
+                jobsList.append([row[1], row[0]])# (seules les 2 premières colonnes sont utiles)
+        del jobsList[0]  # retire la première ligne de la liste (titre)
+
+        # remplace les jobId par les jobCategory correspondants
+        for job in jobsList:
+            jobCategory = professionsType.get(job[1])
+            job[1] = jobCategory
 
 
-try:
-    # récupère la liste des professions
-    professionsType = {}
-    with open(professions, encoding="utf-8", newline='') as f:
-        reader = csv.DictReader(f)
-        for row in reader:
-            professionsType.update({row["id"]: row["category_name"]})
+        # prépare les coordonnées du tableau résultat
 
-    # récupère la liste des jobs
-    jobsList = []
-    with open(jobs, encoding="utf-8", newline='') as f:
-        reader = csv.reader(f)
-        for row in reader:
-            jobsList.append([row[1], row[0]])
-    # retire la première ligne de la liste (titre)
-    del jobsList[0]
+        jobsCategories = set()
+        contractTypes = set()
+        for job in jobsList:
+            jobsCategories.add(job[1])
+            contractTypes.add(job[0])
 
-    # remplace les jobId par les jobCategory correspondants
-    for job in jobsList:
-        jobCategory = professionsType.get(job[1])
-        job[1] = jobCategory
-    print(jobsList)
 
-    # prépare les coordonnées du tableau résultat
+        # compte les résultats
 
-    jobsCategories = set()
-    contractTypes = set()
-    for job in jobsList:
-        jobsCategories.add(job[1])
-        contractTypes.add(job[0])
+        # initialise la première lignes des résultats
+        title = ["---JOBS---"]
+        for cat in jobsCategories:
+            if cat:
+                title.append(cat)
+            else:
+                title.append("AUTRE")
+        count = [title]
 
-    print(jobsCategories)
-    print(contractTypes)
+        lin = 1
+        for contract in contractTypes:
+            col = 1
+            count.append([contract])
+            for category in jobsCategories:
+                count[lin].append(0)
+                for job in jobsList:
+                    if job[0] == contract and job[1] == category:
+                        count[lin][col] += 1
+                col += 1
+            lin += 1
+    finally:
+        f.close()
+    return count
 
-    # compte les résultats
-    count = []
-    lin = 0
-    for contract in contractTypes:
-        col = 0
-        count.append([])
-        for category in jobsCategories:
-            count[lin].append(0)
-            for job in jobsList:
-                if job[0] == contract and job[1] == category:
-                    count[lin][col] += 1
-            col += 1
-        lin += 1
 
-    print("---------------------------------")
-
-    # initialise la première lignes des résultats
-    count = []
-    lin = 0
-    for contract in contractTypes:
-        col = 1
-        count.append([contract])
-        for category in jobsCategories:
-            count[lin].append(0)
-            for job in jobsList:
-                if job[0] == contract and job[1] == category:
-                    count[lin][col] += 1
-            col += 1
-        lin += 1
-
+def display_jobs(count):
+    # affichage des résultats en console
+    form = "{0:15}{1:15}{2:15}{3:15}{4:15}{5:15}{6:15}{7:15}{8:15}"
     for line in count:
-        print(line)
+        print(form.format(*line))
 
-finally:
-    f.close()
+
+display_jobs(job_offers())
